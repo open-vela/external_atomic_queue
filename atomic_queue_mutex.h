@@ -22,8 +22,7 @@ class AtomicQueueMutexT {
     unsigned tail_ = 0;
     alignas(CACHE_LINE_SIZE) T q_[SIZE] = {};
 
-    static constexpr int SHUFFLE_BITS =
-        details::GetIndexShuffleBits<MinimizeContention, SIZE, CACHE_LINE_SIZE / sizeof(T)>::value;
+    static constexpr int SHUFFLE_BITS = details::GetIndexShuffleBits<MinimizeContention, SIZE, CACHE_LINE_SIZE / sizeof(T)>::value;
     using ScopedLock = typename Mutex::scoped_lock;
 
 public:
@@ -70,7 +69,7 @@ using AtomicQueueSpinlockHle = AtomicQueueMutexT<T, SpinlockHle, SIZE, MinimizeC
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-} // namespace atomic_queue
+} // atomic_queue
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
