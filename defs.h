@@ -6,8 +6,7 @@
 
 #include <atomic>
 
-#if defined(__x86_64__) || defined(_M_X64) || \
-    defined(__i386__) || defined(_M_IX86)
+#if defined(__x86_64__)
 #include <emmintrin.h>
 namespace atomic_queue {
 constexpr int CACHE_LINE_SIZE = 64;
@@ -15,26 +14,12 @@ static inline void spin_loop_pause() noexcept {
     _mm_pause();
 }
 } // namespace atomic_queue
-#elif defined(__arm__) || defined(__aarch64__)
+#elif defined(__arm__)
 // TODO: These need to be verified as I do not have access to ARM platform.
 namespace atomic_queue {
 constexpr int CACHE_LINE_SIZE = 64;
 static inline void spin_loop_pause() noexcept {
-#if (defined(__ARM_ARCH_6K__) || \
-     defined(__ARM_ARCH_6Z__) || \
-     defined(__ARM_ARCH_6ZK__) || \
-     defined(__ARM_ARCH_6T2__) || \
-     defined(__ARM_ARCH_7__) || \
-     defined(__ARM_ARCH_7A__) || \
-     defined(__ARM_ARCH_7R__) || \
-     defined(__ARM_ARCH_7M__) || \
-     defined(__ARM_ARCH_7S__) || \
-     defined(__ARM_ARCH_8A__) || \
-     defined(__aarch64__))
-    asm volatile ("yield" ::: "memory");
-#else
-    asm volatile ("nop" ::: "memory");
-#endif
+    __asm__ __volatile__("yield");
 }
 } // namespace atomic_queue
 #else
@@ -45,13 +30,8 @@ static inline void spin_loop_pause() noexcept {
 
 namespace atomic_queue {
 
-#if defined(__GNUC__)
 #define ATOMIC_QUEUE_LIKELY(expr) __builtin_expect(static_cast<bool>(expr), 1)
 #define ATOMIC_QUEUE_UNLIKELY(expr) __builtin_expect(static_cast<bool>(expr), 0)
-#else
-#define ATOMIC_QUEUE_LIKELY(expr) expr
-#define ATOMIC_QUEUE_UNLIKELY(expr) expr
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
