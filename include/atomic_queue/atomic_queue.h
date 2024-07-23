@@ -106,12 +106,13 @@ constexpr T or_equal(T x, unsigned u, Args... rest) noexcept {
     return or_equal(or_equal(x, u), rest...);
 }
 
-constexpr uint32_t round_up_to_power_of_2(uint32_t a) noexcept {
-    return increment(or_equal(decrement(a), 1, 2, 4, 8, 16));
-}
-
-constexpr uint64_t round_up_to_power_of_2(uint64_t a) noexcept {
-    return increment(or_equal(decrement(a), 1, 2, 4, 8, 16, 32));
+template<typename T>
+constexpr T round_up_to_power_of_2(T a) noexcept {
+    a = or_equal(decrement(a), 1, 2, 4, 8, 16);
+    if constexpr (sizeof(T) > 4) {
+        a = or_equal(a, 32);
+    }
+    return increment(a);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
