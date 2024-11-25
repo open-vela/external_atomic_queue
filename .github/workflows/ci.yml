@@ -1,39 +1,18 @@
-name: Continuous Integrations
+# This is a basic workflow to help you get started with Actions
 
+name: CI
+
+# Controls when the workflow will run
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    types:
+      - review
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  unit-test:
-    strategy:
-      matrix:
-        toolset: [gcc, clang]
-        os: [ubuntu-20.04, ubuntu-22.04]
-        include:
-            - sanitize: 1
-            - os: ubuntu-20.04 # Work-around for https://bugs.launchpad.net/ubuntu/+source/gcc-10/+bug/2029910
-              sanitize: 0
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Boost.Test
-      run: sudo apt-get --quiet --yes install libboost-test-dev
-
-    - name: Environment variables
-      run: make -r TOOLSET=${{ matrix.toolset }} env
-
-    - name: Toolset versions
-      run: make -r TOOLSET=${{ matrix.toolset }} versions
-
-    - name: Build and run unit tests
-      run: make -rj2 TOOLSET=${{ matrix.toolset }} example run_tests
-
-    - if: ${{ matrix.sanitize }}
-      name: Build and run unit tests with thread sanitizer
-      run: make -rj2 TOOLSET=${{ matrix.toolset }} BUILD=sanitize run_tests
+  ci:
+    uses: open-vela/public-actions/.github/workflows/ci.yml@trunk
+    secrets: inherit
